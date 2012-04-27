@@ -190,30 +190,16 @@ function ddGame(board) {
     };
 
     self.moveMonster = function (monsterNode) {
-        var x = parseInt(monsterNode.attr("gridx"));
-        var y = parseInt(monsterNode.attr("gridy"));
-
-        var monster = self.getGuy(x, y);
+        var loc = self.getCoords(monsterNode);
+        var monster = self.getGuy(loc.x, loc.y);
 
         if (monsterNode.hasClass("eating")) {
             return;
         }
 
-        var possiblemoves = [];
-        if (self.isPassable(x, y - 1)) {
-            possiblemoves.push({ 'x': x, 'y': y - 1 });
-        }
-        if (self.isPassable(x, y + 1)) {
-            possiblemoves.push({ 'x': x, 'y': y + 1 });
-        }
-        if (self.isPassable(x - 1, y)) {
-            possiblemoves.push({ 'x': x - 1, 'y': y });
-        }
-        if (self.isPassable(x + 1, y)) {
-            possiblemoves.push({ 'x': x + 1, 'y': y });
-        }
-        if (possiblemoves.length !== 0) {
-            var move = possiblemoves[self.random(possiblemoves.length)];
+        var possibleMoves = self.getPossibleDirections(loc, self.isPassable);
+        if (possibleMoves.length !== 0) {
+            var move = possibleMoves[self.random(possibleMoves.length)];
             var target = self.getNode(move.x, move.y);
             self.swap(monsterNode, target, false, true);
         }
