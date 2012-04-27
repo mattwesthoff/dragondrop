@@ -34,6 +34,12 @@ div.monster
     background-color: green;
 }
 
+div.monster.eating
+{
+    border-color: pink;
+    color: pink;
+}
+
 div.empty
 {
             

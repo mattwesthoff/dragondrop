@@ -43,7 +43,7 @@ function ddGame(board) {
         }
 
         if (target.hasClass("monster")) {
-            targetCopy.removeClass("monster").addClass("empty").text("empty");
+            self.eatMonster(targetCopy);
         }
 
         var targetx = target.attr("gridx");
@@ -84,7 +84,7 @@ function ddGame(board) {
             }
         }
         return node;
-    }
+    };
 
     self.isPassable = function (x, y) {
         var guy = self.getGuy(x, y);
@@ -96,7 +96,7 @@ function ddGame(board) {
 
     self.random = function (upto) {
         return Math.floor(Math.random() * upto)
-    }
+    };
 
     self.init = function () {
         var viewmodel = { rows: [] };
@@ -122,22 +122,75 @@ function ddGame(board) {
     
     self.tick = function () {
         $(".grid").trigger("tick");
+        $(".dragon").each(function (index) {
+            self.dragonAttack($(this));
+        });
         $(".monster").each(function (index) {
             self.moveMonster($(this));
         });
         setTimeout(self.tick, self.tickInterval);
-    }
+    };
 
     self.run = function (tickInterval) {
         self.tickInterval = tickInterval;
         setTimeout(self.tick, self.tickInterval);
-    }
+    };
 
-    self.moveMonster= function (monsterNode) {
+    self.getCoords = function (node) {
+        var x = parseInt(node.attr("gridx"));
+        var y = parseInt(node.attr("gridy"));
+
+        return { 'x': x, 'y': y };
+    };
+
+    self.getPossibleDirections = function (loc, testFunc) {
+        var possiblities = [];
+        var testDir = function(x, y) {
+            if (testFunc(x, y)) {
+                possiblities.push({ 'x': x, 'y': y });
+            }
+        };
+        
+        testDir(loc.x, loc.y - 1);
+        testDir(loc.x, loc.y + 1);
+        testDir(loc.x + 1, loc.y);
+        testDir(loc.x - 1, loc.y);
+
+        return possiblities;
+    };
+
+    self.eatMonster = function (monsterNode) {
+        monsterNode.removeClass("monster").addClass("empty").text("empty");
+    };
+
+    self.dragonAttack = function (dragonNode) {
+        //if dragon next to monster, they both wait, with a new class, then the turn after the minion dies
+        var loc = self.getCoords(dragonNode);
+        var adjMonsterLocs = self.getPossibleDirections(loc, function (x, y) {
+            var guy = self.getGuy(x, y);
+            if (guy) { return guy.isMonster(); }
+            return false;
+        });
+        for (var i in adjMonsterLocs) {
+            var monLoc = adjMonsterLocs[i];
+            var monster = self.getNode(monLoc.x, monLoc.y);
+            if (monster.hasClass("eating")) {
+                self.eatMonster(monster);
+            }
+            monster.addClass("eating");
+        }
+    };
+
+    self.moveMonster = function (monsterNode) {
         var x = parseInt(monsterNode.attr("gridx"));
         var y = parseInt(monsterNode.attr("gridy"));
 
         var monster = self.getGuy(x, y);
+
+        if (monsterNode.hasClass("eating")) {
+            return;
+        }
+
         var possiblemoves = [];
         if (self.isPassable(x, y - 1)) {
             possiblemoves.push({ 'x': x, 'y': y - 1 });
@@ -156,7 +209,7 @@ function ddGame(board) {
             var target = self.getNode(move.x, move.y);
             self.swap(monsterNode, target, false, true);
         }
-    }
+    };
 }
 
 $(document).ready(function () {
