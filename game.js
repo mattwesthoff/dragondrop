@@ -18,21 +18,20 @@ var board = [
         [ new square("empty"), new square("wall"), new square("empty"), new square("monster") ]
 ];
 
-function ddGame(board, tickInterval) {
+function ddGame(board) {
     var self = this;
     self.board = board;
-    self.tickInterval = tickInterval;
-
     self.draggableOptions = { revert: true };
 
     self.handleDrop = function (event, ui) {
         var dragon = ui.draggable;
         var target = $(this);
-        self.swap(dragon, target);
+        self.swap(dragon, target, true);
     };
 
-    self.swap = function (source, target) {
-        var sourceCopy = source.clone().css({ "left": '', "opacity": '', "top": '' }).draggable(self.draggableOptions);
+    self.swap = function (source, target, draggableSource) {
+        var sourceCopy = source.clone().css({ "left": '', "opacity": '', "top": '' });
+        if (draggableSource) { sourceCopy.draggable(self.draggableOptions); }
         var targetCopy = target.clone().css({ "left": '', "opacity": '', "top": '' }).droppable({ drop: self.handleDrop });
 
         if (target.hasClass("monster")) {
@@ -49,6 +48,39 @@ function ddGame(board, tickInterval) {
         source.before(targetCopy).remove();
         target.before(sourceCopy).remove();
     };
+    
+    self.getGuy = function (x, y) {
+        if (x < 0 || y < 0) {
+            return null;
+        }
+
+        if (y >= self.board.length || x >= self.board[0].length) {
+            return null;
+        }
+        return self.board[y][x];
+    };
+
+    self.getNode = function (x, y) {
+        var node = $("div[gridx='" + x + "'][gridy='" + y + "']");
+        if (node.length) {
+            if (node.length > 1) {
+                alert("whahahh");
+            }
+        }
+        return node;
+    }
+
+    self.isPassable = function (x, y) {
+        var guy = self.getGuy(x, y);
+        if (guy === null) {
+            return false;
+        }
+        return guy.isEmpty();
+    };
+
+    self.random = function (upto) {
+        return Math.floor(Math.random() * upto)
+    }
 
     self.init = function () {
         var viewmodel = { rows: [] };
@@ -72,7 +104,31 @@ function ddGame(board, tickInterval) {
         $(".monster").droppable({ drop: self.handleDrop});
 
         $(".monster").live('tick', function (event) {
-            $(this).text("ticked!");
+            var monsterNode = $(this);
+            var x = parseInt(monsterNode.attr("gridx"));
+            var y = parseInt(monsterNode.attr("gridy"));
+            
+            var monster = self.getGuy(x, y);
+            var possiblemoves = [];
+            if (self.isPassable(x, y - 1)) {
+                possiblemoves.push({ 'x': x, 'y': y - 1 });
+            }
+            if (self.isPassable(x, y + 1)) {
+                possiblemoves.push({ 'x': x, 'y': y + 1 });
+            }
+            if (self.isPassable(x - 1, y)) {
+                possiblemoves.push({ 'x': x - 1, 'y': y });
+            }
+            if (self.isPassable(x + 1, y)) {
+                possiblemoves.push({ 'x': x + 1, 'y': y });
+            }
+            if (possiblemoves.length !== 0) {
+                var move = possiblemoves[self.random(possiblemoves.length)];
+
+                var target = self.getNode(move.x, move.y);
+                console.log("monster " + x + "," + y + " moving to empty " + move.x + "," + move.y);
+                self.swap(monsterNode, target);
+            }
         });
     };
     
@@ -81,15 +137,17 @@ function ddGame(board, tickInterval) {
         setTimeout(self.tick, self.tickInterval);
     }
 
-    self.run = function () {
+    self.run = function (tickInterval) {
+        self.tickInterval = tickInterval;
         setTimeout(self.tick, self.tickInterval);
     }
 }
 
 $(document).ready(function () {
 
-    var game = new ddGame(board, 1000);
+    var game = new ddGame(board);
     game.init();
-    game.run();
-    
+
+    //2 seconds per tick
+    game.run(2000);
 });
