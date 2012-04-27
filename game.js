@@ -29,10 +29,18 @@ function ddGame(board) {
         self.swap(dragon, target, true);
     };
 
-    self.swap = function (source, target, draggableSource) {
+    self.swap = function (source, target) {
         var sourceCopy = source.clone().css({ "left": '', "opacity": '', "top": '' });
-        if (draggableSource) { sourceCopy.draggable(self.draggableOptions); }
+        
         var targetCopy = target.clone().css({ "left": '', "opacity": '', "top": '' }).droppable({ drop: self.handleDrop });
+
+        if (source.hasClass("ui-draggable")) {
+            sourceCopy.draggable(self.draggableOptions);
+        }
+
+        if (source.hasClass("ui-droppable")) {
+            sourceCopy.droppable({ drop: self.handleDrop });
+        }
 
         if (target.hasClass("monster")) {
             targetCopy.removeClass("monster").addClass("empty").text("empty");
@@ -146,7 +154,7 @@ function ddGame(board) {
         if (possiblemoves.length !== 0) {
             var move = possiblemoves[self.random(possiblemoves.length)];
             var target = self.getNode(move.x, move.y);
-            self.swap(monsterNode, target);
+            self.swap(monsterNode, target, false, true);
         }
     }
 }
