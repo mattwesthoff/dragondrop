@@ -40,8 +40,16 @@ function ddGame(board) {
 
         var targetx = target.attr("gridx");
         var targety = target.attr("gridy");
-        targetCopy.attr("gridx", source.attr("gridx"));
-        targetCopy.attr("gridy", source.attr("gridy"));
+        var sourcex = source.attr("gridx");
+        var sourcey = source.attr("gridy");
+
+        var targetGuy = self.getGuy(targetx, targety);
+        var sourceGuy = self.getGuy(sourcex, sourcey);
+        self.board[targety][targetx] = sourceGuy;
+        self.board[sourcey][sourcex] = targetGuy;
+
+        targetCopy.attr("gridx", sourcex);
+        targetCopy.attr("gridy", sourcey);
         sourceCopy.attr("gridx", targetx);
         sourceCopy.attr("gridy", targety);
 
@@ -102,44 +110,44 @@ function ddGame(board) {
         $(".dragon").draggable(self.draggableOptions);
         $(".empty").droppable({ drop: self.handleDrop });
         $(".monster").droppable({ drop: self.handleDrop});
-
-        $(".monster").live('tick', function (event) {
-            var monsterNode = $(this);
-            var x = parseInt(monsterNode.attr("gridx"));
-            var y = parseInt(monsterNode.attr("gridy"));
-            
-            var monster = self.getGuy(x, y);
-            var possiblemoves = [];
-            if (self.isPassable(x, y - 1)) {
-                possiblemoves.push({ 'x': x, 'y': y - 1 });
-            }
-            if (self.isPassable(x, y + 1)) {
-                possiblemoves.push({ 'x': x, 'y': y + 1 });
-            }
-            if (self.isPassable(x - 1, y)) {
-                possiblemoves.push({ 'x': x - 1, 'y': y });
-            }
-            if (self.isPassable(x + 1, y)) {
-                possiblemoves.push({ 'x': x + 1, 'y': y });
-            }
-            if (possiblemoves.length !== 0) {
-                var move = possiblemoves[self.random(possiblemoves.length)];
-
-                var target = self.getNode(move.x, move.y);
-                console.log("monster " + x + "," + y + " moving to empty " + move.x + "," + move.y);
-                self.swap(monsterNode, target);
-            }
-        });
     };
     
     self.tick = function () {
         $(".grid").trigger("tick");
+        $(".monster").each(function (index) {
+            self.moveMonster($(this));
+        });
         setTimeout(self.tick, self.tickInterval);
     }
 
     self.run = function (tickInterval) {
         self.tickInterval = tickInterval;
         setTimeout(self.tick, self.tickInterval);
+    }
+
+    self.moveMonster= function (monsterNode) {
+        var x = parseInt(monsterNode.attr("gridx"));
+        var y = parseInt(monsterNode.attr("gridy"));
+
+        var monster = self.getGuy(x, y);
+        var possiblemoves = [];
+        if (self.isPassable(x, y - 1)) {
+            possiblemoves.push({ 'x': x, 'y': y - 1 });
+        }
+        if (self.isPassable(x, y + 1)) {
+            possiblemoves.push({ 'x': x, 'y': y + 1 });
+        }
+        if (self.isPassable(x - 1, y)) {
+            possiblemoves.push({ 'x': x - 1, 'y': y });
+        }
+        if (self.isPassable(x + 1, y)) {
+            possiblemoves.push({ 'x': x + 1, 'y': y });
+        }
+        if (possiblemoves.length !== 0) {
+            var move = possiblemoves[self.random(possiblemoves.length)];
+            var target = self.getNode(move.x, move.y);
+            self.swap(monsterNode, target);
+        }
     }
 }
 
