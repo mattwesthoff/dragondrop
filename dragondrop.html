@@ -12,7 +12,7 @@
 <body>
     <script type="text/html" id="grid-template">
         <div class="row" data-bind="foreach: $data.squares">
-            <div class="grid" data-bind="css: { 'dragon':isDragon(), 'wall':isWall(), 'empty':isEmpty(), 'monster':isMonster() }, text: type, attr:{ grid_id: id, draggable: isDraggable() }"></div>
+            <div class="grid" data-bind="css: { 'dragon':isDragon(), 'wall':isWall(), 'empty':isEmpty(), 'monster':isMonster() }, text: type, attr:{ gridx: x, gridy: y, draggable: isDraggable() }"></div>
         </div>
     </script>
     <div data-bind="template: {name:'grid-template', foreach: rows}"></div>

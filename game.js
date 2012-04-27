@@ -1,8 +1,7 @@
-﻿var count = 0;
-
-function square(type) {
+﻿function square(type) {
     var self = this;
-    self.id = count++;
+    self.x = 0;
+    self.y = 0;
     self.type = type;
     self.isDragon = function () { return self.type === 'dragon'; };
     self.isWall = function () { return self.type === 'wall'; };
@@ -19,45 +18,69 @@ var board = [
         [ new square("empty"), new square("wall"), new square("empty"), new square("monster") ]
 ];
 
-$(document).ready(function () {
-    var viewmodel = { rows: [] };
+function ddGame(board) {
+    var self = this;
+    self.board = board;
 
-    for (var id in board) {
-        var row = { squares: [] };
-        var boxes = board[id];
-        for (var bid in boxes) {
-            row.squares.push(boxes[bid]);
-        }
-        viewmodel.rows.push(row);
-    }
+    self.draggableOptions = { revert: true };
 
-    var draggableOptions = {
-        revert: true,
-        start: function () {
-            dragSource = $(this).parent();
-        }
-    };
-    ko.applyBindings(viewmodel);
-
-    $(".dragon").draggable(draggableOptions);
-
-    var dropFunction = function (event, ui) {
+    self.handleDrop = function (event, ui) {
         var dragon = ui.draggable;
         var target = $(this);
-        var dragonCopy = dragon.clone().css({ "left": '', "opacity": '', "top": '' }).draggable(draggableOptions);
-        var targetCopy = target.clone().css({ "left": '', "opacity": '', "top": '' }).droppable({ drop: dropFunction });
+        self.swap(dragon, target);
+    };
+
+    self.swap = function (source, target) {
+        var sourceCopy = source.clone().css({ "left": '', "opacity": '', "top": '' }).draggable(self.draggableOptions);
+        var targetCopy = target.clone().css({ "left": '', "opacity": '', "top": '' }).droppable({ drop: self.handleDrop });
 
         if (target.hasClass("monster")) {
             targetCopy.removeClass("monster").addClass("empty").text("empty");
         }
-        
-        dragon.before(targetCopy).remove();
-        target.before(dragonCopy).remove();
-    }
 
-    var dragSource = null;
-    $(".empty").droppable({ drop: dropFunction });
-    $(".monster").droppable({ drop: dropFunction });
+        var targetx = target.attr("gridx");
+        var targety = target.attr("gridy");
+        targetCopy.attr("gridx", source.attr("gridx"));
+        targetCopy.attr("gridy", source.attr("gridy"));
+        sourceCopy.attr("gridx", targetx);
+        sourceCopy.attr("gridy", targety);
+
+        source.before(targetCopy).remove();
+        target.before(sourceCopy).remove();
+    };
+
+    self.init = function () {
+        var viewmodel = { rows: [] };
+
+        for (var y in self.board) {
+            var row = { squares: [] };
+            var boxes = self.board[y];
+            for (var x in boxes) {
+                var box = boxes[x];
+                box.x = x;
+                box.y = y;
+                row.squares.push(box);
+            }
+            viewmodel.rows.push(row);
+        }
+
+        ko.applyBindings(viewmodel);
+
+        $(".dragon").draggable(self.draggableOptions);
+        $(".empty").droppable({ drop: self.handleDrop });
+        $(".monster").droppable({ drop: self.handleDrop});
+
+        $(".monster").live('tick', function (event) {
+
+        });
+    };
+    
+}
+
+$(document).ready(function () {
+
+    var game = new ddGame(board);
+    game.init();
+
+
 });
-
-
