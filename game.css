@@ -1,0 +1,45 @@
+﻿.hovered
+{
+    font-weight: 900;
+    cursor: move;
+}
+
+div.row
+{
+    height: 152px;
+}
+        
+div.grid
+{
+    float: left;
+    text-align: center;
+    border: 1px solid gray;
+    width: 150px;
+    height: 150px;
+    margin:  0px 0px;
+}
+        
+div.dragon
+{
+    background-color: red;
+}
+
+div.wall
+{
+    background-color:  gray;
+}
+
+div.monster
+{
+    background-color: green;
+}
+
+div.empty
+{
+            
+}
+
+div.drag-target
+{
+    border: 1px dashed blue;
+}

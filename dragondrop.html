@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="game.css" />
+    <script lang="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script lang="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+    <script lang="text/javascript" src="http://cloud.github.com/downloads/SteveSanderson/knockout/knockout-2.0.0.debug.js"></script>
+    <script lang="text/javascript" src="game.js"></script>
+    <title></title>
+</head>
+<body>
+    <script type="text/html" id="grid-template">
+        <div class="row" data-bind="foreach: $data.squares">
+            <div class="grid" data-bind="css: { 'dragon':isDragon(), 'wall':isWall(), 'empty':isEmpty(), 'monster':isMonster() }, text: type, attr:{ grid_id: id, draggable: isDraggable() }"></div>
+        </div>
+    </script>
+    <div data-bind="template: {name:'grid-template', foreach: rows}"></div>
+</body>
+</html>
