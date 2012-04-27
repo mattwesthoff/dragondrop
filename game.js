@@ -122,12 +122,15 @@ function ddGame(board) {
     
     self.tick = function () {
         $(".grid").trigger("tick");
-        $(".dragon").each(function (index) {
-            self.dragonAttack($(this));
-        });
+
         $(".monster").each(function (index) {
             self.moveMonster($(this));
         });
+
+        $(".dragon").each(function (index) {
+            self.dragonAttack($(this));
+        });
+
         setTimeout(self.tick, self.tickInterval);
     };
 
