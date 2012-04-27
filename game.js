@@ -18,9 +18,10 @@ var board = [
         [ new square("empty"), new square("wall"), new square("empty"), new square("monster") ]
 ];
 
-function ddGame(board) {
+function ddGame(board, tickInterval) {
     var self = this;
     self.board = board;
+    self.tickInterval = tickInterval;
 
     self.draggableOptions = { revert: true };
 
@@ -71,16 +72,24 @@ function ddGame(board) {
         $(".monster").droppable({ drop: self.handleDrop});
 
         $(".monster").live('tick', function (event) {
-
+            $(this).text("ticked!");
         });
     };
     
+    self.tick = function () {
+        $(".grid").trigger("tick");
+        setTimeout(self.tick, self.tickInterval);
+    }
+
+    self.run = function () {
+        setTimeout(self.tick, self.tickInterval);
+    }
 }
 
 $(document).ready(function () {
 
-    var game = new ddGame(board);
+    var game = new ddGame(board, 1000);
     game.init();
-
-
+    game.run();
+    
 });
