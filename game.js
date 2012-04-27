@@ -161,6 +161,12 @@ function ddGame(board) {
 
     self.eatMonster = function (monsterNode) {
         monsterNode.removeClass("monster").addClass("empty").text("empty");
+        var monsterLoc = self.getCoords(monsterNode);
+        var corpse = new square("empty");
+        corpse.x = monsterLoc.x;
+        corpse.y = monsterLoc.y;
+        self.board[monsterLoc.y][monsterLoc.x] = corpse;
+
     };
 
     self.dragonAttack = function (dragonNode) {
@@ -177,7 +183,9 @@ function ddGame(board) {
             if (monster.hasClass("eating")) {
                 self.eatMonster(monster);
             }
-            monster.addClass("eating");
+            else {
+                monster.addClass("eating");
+            }
         }
     };
 
