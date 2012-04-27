@@ -26,7 +26,8 @@ function ddGame(board) {
     self.handleDrop = function (event, ui) {
         var dragon = ui.draggable;
         var target = $(this);
-        self.swap(dragon, target, true);
+        dragon =  self.swap(dragon, target, true);
+        self.dragonAttack(dragon);
     };
 
     self.swap = function (source, target) {
@@ -63,6 +64,8 @@ function ddGame(board) {
 
         source.before(targetCopy).remove();
         target.before(sourceCopy).remove();
+
+        return sourceCopy;
     };
     
     self.getGuy = function (x, y) {
@@ -122,7 +125,7 @@ function ddGame(board) {
     
     self.tick = function () {
         $(".grid").trigger("tick");
-
+ 
         $(".monster").each(function (index) {
             self.moveMonster($(this));
         });
@@ -130,7 +133,6 @@ function ddGame(board) {
         $(".dragon").each(function (index) {
             self.dragonAttack($(this));
         });
-
         setTimeout(self.tick, self.tickInterval);
     };
 
@@ -175,6 +177,7 @@ function ddGame(board) {
     self.dragonAttack = function (dragonNode) {
         //if dragon next to monster, they both wait, with a new class, then the turn after the minion dies
         var loc = self.getCoords(dragonNode);
+        
         var adjMonsterLocs = self.getPossibleDirections(loc, function (x, y) {
             var guy = self.getGuy(x, y);
             if (guy) { return guy.isMonster(); }
@@ -182,6 +185,7 @@ function ddGame(board) {
         });
         for (var i in adjMonsterLocs) {
             var monLoc = adjMonsterLocs[i];
+            console.log("dragon attacking monster(" + monLoc.x + "," + monLoc.y + ")");
             var monster = self.getNode(monLoc.x, monLoc.y);
             if (monster.hasClass("eating")) {
                 self.eatMonster(monster);
