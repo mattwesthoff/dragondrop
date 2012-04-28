@@ -1,4 +1,4 @@
-﻿function square(type) {
+function square(type) {
     var self = this;
     self.x = 0;
     self.y = 0;
@@ -11,11 +11,10 @@
 }
 
 var board = [
-        [ new square("wall"), new square("dragon"), new square("monster"), new square("empty") ],
-        [ new square("wall"), new square("wall"), new square("empty"), new square("empty") ],
-        [ new square("dragon"), new square("empty"), new square("monster"), new square("empty") ],
-        [ new square("empty"), new square("empty"), new square("wall"), new square("empty") ],
-        [ new square("empty"), new square("wall"), new square("empty"), new square("monster") ]
+        [ new square("wall"), new square("dragon"), new square("monster"), new square("empty"), new square("wall"),new square("monster") ],
+        [ new square("wall"), new square("wall"), new square("empty"), new square("empty"), new square("monster"),new square("empty") ],
+        [ new square("dragon"), new square("empty"), new square("monster"), new square("empty"), new square("monster"),new square("wall") ],
+        [ new square("empty"), new square("empty"), new square("wall"), new square("empty"), new square("empty"),new square("monster") ]
 ];
 
 function ddGame(board) {
